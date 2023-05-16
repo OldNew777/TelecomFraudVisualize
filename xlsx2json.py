@@ -40,8 +40,8 @@ def xlsx2json(xlsx_file):
         return dict
 
     dict = convert_to_dict(df)
-    with open(json_file, 'w') as f:
-        json.dump(dict, f, indent=4, ensure_ascii=True)
+    with open(json_file, 'w', encoding='utf-8') as f:
+        json.dump(dict, f, indent=4, ensure_ascii=False)
 
 
 if __name__ == '__main__':
