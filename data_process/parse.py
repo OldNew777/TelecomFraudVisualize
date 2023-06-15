@@ -2,6 +2,7 @@ import json
 import re
 from tqdm import tqdm
 
+
 def parse_criminal(data):
     all_criminals = []
     for item in tqdm(data):
@@ -13,12 +14,14 @@ def parse_criminal(data):
             all_criminals.append(item)
     return all_criminals
 
+
 def parse(path):
     data = json.load(open(path, "r", encoding="utf-8"))
     print(f"{len(data)} items loaded.")
     all_criminals = parse_criminal(data)
     print(f"{len(all_criminals)} criminals parsed.")
     return all_criminals
+
 
 if __name__ == "__main__":
     all_criminals = parse("data/data.json")
