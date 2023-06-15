@@ -194,6 +194,8 @@ def date_to_utf8(date: str):
 def process_date_range(input_path, output_path):
     data = json.load(open(input_path, encoding="utf-8"))
     date_range_dict = {}
+    # create dataframe
+    df = pandas.DataFrame(columns=["文书ID", "判罚经过天数"])
     for item in data:
         id = item['文书ID']
         end_time = datetime.strptime(item["裁判日期"], "%Y-%m-%d")
@@ -210,13 +212,15 @@ def process_date_range(input_path, output_path):
             print(f"no start time found for {id}")
             continue
         date_range_dict[id] = {"判罚经过天数": date_range.days}
+        df = df.append({"文书ID": id, "判罚经过天数": date_range.days}, ignore_index=True)
     
     json.dump(date_range_dict, open(output_path, "w", encoding="utf-8"), ensure_ascii=False)
+    df.to_csv(output_path.replace('.json', '.csv'), index=False, encoding="utf-8")
 
 
 if __name__ == "__main__":
     # process_criminals("data/criminals.csv", "data/criminals_processed.csv")
-    process_date_range("data/data - slice.json", "data/data - slice_processed.json")
+    process_date_range("data/data.json", "data/date_range.json")
 
     # date = '2016-0５-20'
     # print(ord('５'))
