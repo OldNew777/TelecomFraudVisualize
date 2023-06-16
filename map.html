@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <svg width="1600" height="1000" id="mapsvg" class="svgs"></svg>
+  <svg width="1000" height="1000" id="mapsvg" class="svgs"></svg>
   <script>
     // The following code is the typical routine of my d3.js code. 
     const svg = d3.select('#mapsvg');
@@ -31,8 +31,8 @@
 
 
     var mercator = d3.geoMercator()
-      .center([107, 34])//设置投影的中心点 经纬度
-      .scale(1000)//设置缩放因子
+      .center([105, 33])//设置投影的中心点 经纬度
+      .scale(900)//设置缩放因子
       .translate([width / 2, height / 2]);//设置平移偏移量
 
     var geoPath = d3.geoPath().projection(mercator).pointRadius(1);
@@ -246,9 +246,9 @@
       svg
         .append('svg')
         .attr('width', 500)
-        .attr('height', 100)
+        .attr('height', 200)
         .append('g')
-        .attr('transform', 'translate(30,30)')
+        .attr('transform', 'translate(30,30) scale(1.5)')
         .call(slider);
 
       // svg.append('g')
