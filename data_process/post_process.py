@@ -195,24 +195,39 @@ def process_date_range(input_path, output_path):
     data = json.load(open(input_path, encoding="utf-8"))
     date_range_dict = {}
     # create dataframe
-    df = pandas.DataFrame(columns=["文书ID", "判罚经过天数"])
+    df = pandas.DataFrame(columns=["id", "judge_date_range"])
+    cnt_no_start_time = 0
+    cnt_date_range_error = 0
     for item in data:
         id = item['文书ID']
         end_time = datetime.strptime(item["裁判日期"], "%Y-%m-%d")
         record = item["诉讼记录"]
         # match xxxx年x月x日
-        start_time = re.search(r"[\d]{4}年[\d]{1,2}月[\d]{1,2}日", record)
-        if start_time:
+        time_point_list = re.findall(r"[\d]{4}年[\d]{1,2}月[\d]{1,2}日", record)
+        if len(time_point_list) > 0:
             # transform from unicode to utf-8 string
-            start_time = start_time.group()
-            start_time = date_to_utf8(start_time)
-            start_time = datetime.strptime(start_time, "%Y-%m-%d")
+            start_time = time_point_list[0]
+            start_time = datetime.strptime(date_to_utf8(start_time), "%Y-%m-%d")
+            end_time = max(end_time, datetime.strptime(date_to_utf8(time_point_list[-1]), "%Y-%m-%d"))
             date_range = end_time - start_time
         else:
-            print(f"no start time found for {id}")
+            # print(f"no start time found for {id}")
+            cnt_no_start_time += 1
             continue
+    
+        release_time = datetime.strptime(item["发布日期"], "%Y-%m-%d")
+        if date_range.days <= 0:
+            print(f"date range error for {id}")
+            print(start_time, end_time, release_time)
+            print(record)
+            cnt_date_range_error += 1
+            continue
+
         date_range_dict[id] = {"判罚经过天数": date_range.days}
-        df = df.append({"文书ID": id, "判罚经过天数": date_range.days}, ignore_index=True)
+        df = df.append({"id": id, "judge_date_range": date_range.days}, ignore_index=True)
+
+    print(f"cnt_no_start_time: {cnt_no_start_time}")
+    print(f"cnt_date_range_error: {cnt_date_range_error}")
     
     json.dump(date_range_dict, open(output_path, "w", encoding="utf-8"), ensure_ascii=False)
     df.to_csv(output_path.replace('.json', '.csv'), index=False, encoding="utf-8")

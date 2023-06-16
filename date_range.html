@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Judge Date Range</title>
+    <script src="d3.min.js"></script>
+    <script src="d3-v6-tip.js"></script>
+    <script src="jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="d3-tip.css">
+</head>
+
+<body>
+    <svg width="1400" height="1400" id="mainsvg" class="svgs"></svg>
+    <script>
+        const svg = d3.select('svg');
+        const width = svg.attr('width');
+        const height = svg.attr('height');
+        const margin = { top: 60, right: 30, bottom: 60, left: 150 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        let range_count = []
+
+        const date_range_group = svg.append('g')
+            .attr('id', 'date_range_group')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+        const yValue = d => d.judge_date_range;
+        let xScale, yScale, color;
+
+        const fullAxes = function () {
+            const yAxis = d3.axisLeft(yScale)
+                .tickSize(-innerWidth)
+                .tickPadding(10);
+            const xAxis = d3.axisBottom(xScale)
+                .tickSize(-innerHeight)
+                .tickPadding(10);
+
+            let yAxis_group = date_range_group.append('g')
+                .attr('id', 'yAxis_group')
+                .call(yAxis);
+            yAxis_group.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -50)
+                .attr('x', -innerHeight / 2)
+                .attr('fill', 'black')
+                .text('案件数量')
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '3.5em')
+                .attr('font-weight', 'bold');
+            yAxis_group.selectAll('.domain').remove();
+
+            let xAxis_group = date_range_group.append('g')
+                .attr('id', 'xAxis_group')
+                .attr('transform', `translate(0, ${innerHeight})`)
+                .call(xAxis);
+            xAxis_group.append('text')
+                .attr('y', 50)
+                .attr('x', innerWidth / 2)
+                .attr('fill', 'black')
+                .text('上诉-判罚间隔（天）')
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '3.5em')
+                .attr('font-weight', 'bold');
+            xAxis_group.selectAll('.domain').remove();
+        }
+
+        d3.csv('data/date_range.csv').then(data => {
+            // data.forEach(d => {
+            //     exist_flag = false;
+            //     range_count.forEach(r => {
+            //         if (r.judge_date_range == d.judge_date_range) {
+            //             r.count += 1;
+            //             exist_flag = true;
+            //         }
+            //     });
+            //     if (!exist_flag) {
+            //         range_count.push({
+            //             judge_date_range: d.judge_date_range,
+            //             count: 1
+            //         });
+            //     }
+            // });
+
+            xScale = d3.scaleLinear()
+                .domain(d3.extent(data, d => d.judge_date_range))
+                .range([0, innerWidth])
+                .nice();
+
+            let histogram = d3.bin()
+                .value(yValue)
+                .domain(xScale.domain())
+                .thresholds(xScale.ticks(20));
+
+            let binData = histogram(data);
+
+            yScale = d3.scaleLinear()
+                .domain([0, d3.max(binData, d => d.length)])
+                .range([innerHeight, 0])
+                .nice();
+
+            color = d3.scaleOrdinal().range(d3.schemePaired.concat(d3.schemeCategory10));
+
+
+            let his_rec_group = date_range_group.append('g')
+                .attr('id', 'his_rec_group');
+
+            his_rec_group.selectAll('.his_rec').data(binData)
+                .join('rect')
+                .attr('class', 'his_rec')
+                .attr('x', d => xScale(d.x0))
+                .attr('y', d => yScale(d.length))
+                .attr('width', d => xScale(d.x1) - xScale(d.x0))
+                .attr('height', d => yScale(0) - yScale(d.length))
+                .attr('fill', (d, i) => color(i))
+
+            fullAxes();
+        });
+    </script>
+</body>
+
+</html>
