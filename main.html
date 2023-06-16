@@ -7,50 +7,81 @@
     <script src="d3-v6-tip.js"></script>
     <script src="jquery-3.4.1.min.js"></script>
     <link rel="stylesheet" href="d3-tip.css">
+
+    <style>
+        .center-box {
+            text-align: center;
+        }
+
+        .baincheng-sp {
+            display: block;
+            margin: 0 auto;
+
+        }
+    </style>
 </head>
 
 <body width="100%" height="100%">
-    <table width="100%" height="100%" cellspacing="0">
+    <table width="100%" height="100%" cellspacing="20">
         <tr>
-            <td width="80%">
-                <iframe width="500" height="500" src="education.html" frameborder="no" scrolling="no"></iframe>
+            <td>
+                <div style="display: flex; justify-content: center;">
+                    <iframe width="600" height="600" src="education.html" frameborder="no" scrolling="no"></iframe>
+                </div>
+            </td>
+            <td colspan="2">
+                <!-- title "电信诈骗案件可视化" -->
+                <div style="margin-bottom: 200px;">
+                    <div style="text-align: center; font-size: 50px; font-weight: bold;">
+                        电信诈骗案件可视化
+                    </div>
+                    <div style="text-align: center; font-size: 25px;">
+                        鄢涤非，陈新，施宇涛
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: center;">
+                    <iframe width="600" height="600" src="age.html" frameborder="no" scrolling="no"></iframe>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td rowspan="2">
+                <div style="display: flex; justify-content: center;">
+                    <iframe width="600" height="600" src="law.html" frameborder="no" scrolling="no"></iframe>
+                </div>
+            </td>
+            <td rowspan="2" colspan="2">
+                <div style="display: flex; justify-content: center;">
+                    <iframe width="1000" height="1000" src="map.html" frameborder="no" scrolling="no"></iframe>
+                </div>
             </td>
             <td rowspan="2">
-                <iframe width="1600" height="1000" src="map.html" frameborder="no" scrolling="no"></iframe>
-            </td>
-            <td>
-
+                <div style="display: flex; justify-content: center;">
+                    <iframe width="600" height="600" src="date_range.html" frameborder="no" scrolling="no"></iframe>
+                </div>
             </td>
         </tr>
+        <tr></tr>
         <tr>
-            <td>
-                <iframe width="500" height="500" src="education.html" frameborder="no" scrolling="no"></iframe>
+            <td colspan="2">
+                <div style="display: flex; justify-content: center;">
+                    <iframe width="1200" height="600" src="sentence.html" frameborder="no" scrolling="no"></iframe>
+                </div>
             </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
+            <td colspan="2">
+                <div style="display: flex; justify-content: center;">
+                    <iframe width="1200" height="600" src="fine.html" frameborder="no" scrolling="no"></iframe>
+                </div>
+            </td>
         </tr>
     </table>
 
-    <!-- <div id="education_div">
-        <iframe width="500" height="500" src="education.html" frameborder="no" scrolling="no"></iframe>
-    </div>
-    <div id="date_range_div">
-        <iframe width="1400" height="1400" src="date_range.html" frameborder="no" scrolling="no"></iframe>
-    </div>
-    <div id="map_div"></div>
     <div id="age_div"></div>
     <div id="fine_div"></div>
     <div id="sentence_div"></div>
-    <div id="law_div"></div> -->
-
-    <!-- <object data="education.html" width="1400" height="1400"></object>
-    <object data="date_range.html" width="1400" height="1400"></object> -->
-
-    <script>
-    </script>
+    <div id="law_div"></div>
 </body>
 
 </html>

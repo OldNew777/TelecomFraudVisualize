@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <svg width="1000" height="1000" id="mainsvg" class="svgs" transform="scale(0.6), translate(-400, -400)"></svg>
+    <svg width="800" height="800" id="mainsvg" class="svgs" transform="scale(0.75), translate(-150, -150)"></svg>
     <script>
         const innerArcGenerator = d3.arc().innerRadius(60).outerRadius(260).padAngle(0.01).padRadius(100).cornerRadius(5);
         const outerArcGenerator = d3.arc().innerRadius(280).outerRadius(280).padAngle(0.01).padRadius(100).cornerRadius(5);
@@ -42,7 +42,7 @@
         const svg = d3.select('#mainsvg');
         const width = svg.attr('width');
         const height = svg.attr('height');
-        const margin = { top: 60, right: 30, bottom: 60, left: 150 };
+        const margin = { top: 0, right: 0, bottom: 0, left: 0 };
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
 
@@ -53,7 +53,7 @@
         tip_education.attr('id', 'tip-education').attr('class', 'd3-tip');
         const tipele_education = document.getElementById('tip-education');
 
-        d3.select('body').on('mousemove', event => {
+        d3.select('body').on('mousemove', (event, d) => {
             if (tip_education.isShown) {
                 d3.select('#tip-education')
                     .style('top', `${event.y + $(window).scrollTop() - tipele_education.offsetHeight - 10}px`)
