@@ -20,9 +20,10 @@
     const margin = { top: 60, right: 30, bottom: 60, left: 150 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
+    // const mainGroup = svg.append('g')
+    //   .attr('transform', `translate(${margin.left}, ${margin.top})`)
+    const mapGroup = svg.append('g')
     const pointGroup = svg.append('g')
-    const mainGroup = svg.append('g')
-      .attr('transform', `translate(${margin.left}, ${margin.top})`)
     const xValue = d => d.value;
     const yValue = d => d.name;
     const xScale = d3.scaleLinear();
@@ -38,7 +39,14 @@
 
 
     const tip = d3.tip().attr("class", "d3-tip")
-      .html((event, d) => `${d.properties.name}`)
+      .html((event, d) => {
+        if (!zoomed) {
+          return `${d.properties.name}`;
+        } else {
+          // show detail
+          return `${d.date}<br>涉案人数：${d.criminals.length} 人`
+        }
+      })
     svg.call(tip)
     const tipele = document.getElementsByClassName('d3-tip')[0];
     let tipShow = false;
@@ -52,19 +60,65 @@
     // }
     // setInterval(update, 100);
 
+    let zoomed = false;
+    let zoomx, zoomy, zoomscale, zoom_place;
     function highlightMap(event, d) {
-      d3.select(`#${d.properties.name}`).attr('opacity', 0.5);
-      d3.select('.d3-tip')
-        .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
-        .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
-      tip.show(event, d);
-      tipShow = true;
+      if (!zoomed) {
+        d3.select(`#${d.properties.name}`).attr('opacity', 0.5);
+        d3.select('.d3-tip')
+          .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
+          .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
+        tip.show(event, d);
+        tipShow = true;
+      }
     }
 
     function removeHighlightMap(event, d) {
-      d3.select(`#${d.properties.name}`).attr('opacity', 1);
-      tip.hide(event, d);
-      tipShow = false;
+      if (!zoomed) {
+        d3.select(`#${d.properties.name}`).attr('opacity', 1);
+        tip.hide(event, d);
+        tipShow = false;
+      }
+    }
+
+    function clickMap(event, d) {
+      let bbox = document.getElementById(`${d.properties.name}`).getBBox();
+      let centerx = bbox.x + bbox.width / 2;
+      let centery = bbox.y + bbox.height / 2;
+      zoomscale = Math.min(width / bbox.width, height / bbox.height) / 1.2;
+      zoomx = -centerx * zoomscale + width / 2;
+      zoomy = -centery * zoomscale + height / 2;
+      if (!zoomed) {
+        zoomed = true;
+        zoom_place = d.properties.name;
+        mapGroup.selectAll("path")
+          .transition().duration(300)
+          .attr("opacity", dd => dd == d ? 1 : 0)
+          .transition().duration(500)
+          .attr("transform", `translate(${zoomx}, ${zoomy}) scale(${zoomscale})`)
+          .on("end", () => {
+
+            tip.hide();
+            tipShow = false;
+          })
+        pointGroup.selectAll("path")
+          .transition().duration(300)
+          .attr("opacity", dd => dd.place == d.properties.name ? 0.6 : 0)
+          .transition().duration(500)
+          .attr("transform", `translate(${zoomx}, ${zoomy}) scale(${zoomscale})`)
+      } else {
+        mapGroup.selectAll("path")
+          .transition().duration(500)
+          .attr("transform", "")
+          .transition().duration(300)
+          .attr("opacity", 1)
+          .on("end", () => { zoomed = false; })
+        pointGroup.selectAll("path")
+          .transition().duration(500)
+          .attr("transform", "")
+          .transition().duration(300)
+          .attr("opacity", 0.6)
+      }
     }
 
     let bounding_boxes = {};
@@ -89,7 +143,7 @@
 
     function scatter(year, map_data) {
       d3.json("data/place.json").then(data => {
-        svg.selectAll(".scatter-point").remove();
+        pointGroup.selectAll(".scatter-point").remove();
         Object.keys(data).forEach(key => {
           // if (key != "065796bdaa33460d94d2aa030108ac29") return;
           let obj = data[key];
@@ -112,17 +166,35 @@
               //   console.log(map_item.geometry.coordinates[0][0])
               // console.log(d3.polygonContains(map_item.geometry.coordinates[0][0], [107, 35.5]))
               // }
-              svg.append("path")
+              pointGroup.append("path")
+                .data([obj])
                 .attr("d", geoPath({
                   "type": "Point",
                   "coordinates": point_xy
                 }))
                 .attr("stroke", "#694ED3")
                 .attr("fill", "#694ED3")
-                .attr("opacity", 0.6)
-                .attr("class", "scatter-point")
-                .on("mouseover", event => { highlightMap(event, map_item) })
-                .on("mouseout", event => { removeHighlightMap(event, map_item) });
+                .attr("opacity", zoomed && zoom_place != obj.place ? 0 : 0.6)
+                .attr("transform", zoomed ? `translate(${zoomx}, ${zoomy}) scale(${zoomscale})` : "")
+                .attr("class", `scatter-point ${obj.place}`)
+                .on("mouseover", event => {
+                  highlightMap(event, map_item);
+                  if (zoomed) {
+                    d3.select('.d3-tip')
+                      .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
+                      .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
+                    tip.show(event, obj);
+                    tipShow = true;
+                  }
+                })
+                .on("mouseout", event => {
+                  removeHighlightMap(event, map_item);
+                  if (zoomed) {
+                    tip.hide(event, obj);
+                    tipShow = false;
+                  }
+                })
+                .on("click", event => { clickMap(event, map_item) })
             }
           });
         })
@@ -138,8 +210,7 @@
 
 
       //绘制区域
-      svg.append('g')
-        .selectAll('path')
+      mapGroup.selectAll('path')
         .data(data.features)
         .join("path")
         .attr('stroke', 'gray')
@@ -156,6 +227,7 @@
               .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
           }
         })
+        .on('click', clickMap)
 
       var slider = d3
         .sliderHorizontal()
