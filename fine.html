@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>罚金热力图</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+      .cell {
+        stroke: #fff;
+      }
+      .cell:hover {
+        stroke: #f00;
+        stroke-width: 2px;
+      }
+      .tooltip {
+        position: absolute;
+        z-index: 10;
+        visibility: hidden;
+        background-color: white;
+        border: 1px solid black;
+        padding: 5px;
+      }
+      .legend {
+        font-size: 12px;
+        fill: #da0d0d;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const xValues = [0,1000,5000,10000,30000,50000,100000,300000,500000,1000000];
+      const data = [1911,8088,7280,6011,2196,1917,1820,362,272,284];
+      
+      // 定义画布大小和边距
+      const margin = {top: 20, right: 20, bottom: 50, left: 50};
+      const width = 800 - margin.left - margin.right;
+      const height = 600 - margin.top - margin.bottom;
+
+      // 定义颜色比例尺
+      const color = d3.scaleSequential(d3.interpolateBlues)
+        .domain([0, d3.max(data)]);
+
+      // 定义x比例尺和轴
+      const x = d3.scaleBand()
+        .domain(xValues)
+        .range([0, width])
+        .padding(1);
+      const xAxis = d3.axisBottom(x);
+
+      // 创建svg元素并添加到页面中
+      const svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      // 绘制矩形和添加交互效果
+      svg.selectAll(".cell")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "cell")
+        .attr("x", (d, i) => x(xValues[i]))
+        .attr("y", 0)
+        .attr("width", width / data.length-6)
+        .attr("height", height)
+        .attr("fill", d => color(d))
+        .on("mouseover", function(d, i) { // 鼠标移上去显示tooltip
+          d3.select(this).style("stroke-width", 2);
+          d3.select(".tooltip")
+            .style("visibility", "visible")
+            .style("white-space", "pre")
+            .text(`人数 ${d}`)
+            .style("top", (d3.event.pageY-10)+"px")
+            .style("left",(d3.event.pageX+10)+"px");
+        })
+        .on("mouseout", function() { // 鼠标移开隐藏tooltip
+          d3.select(this).style("stroke-width", 1);
+          d3.select(".tooltip").style("visibility", "hidden");
+        });
+
+      // 添加x轴
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+      // 添加图例
+      const legend = svg.selectAll(".legend")
+        .data(color.ticks(8).slice(1).reverse())
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", (d, i) => "translate(0," + (i * 20) + ")");
+
+      legend.append("rect")
+        .attr("x", width + 10)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", color);
+
+      legend.append("text")
+        .attr("x", width + 34)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .text(d => d.toFixed(2));
+
+      // 添加tooltip元素
+      d3.select("body").append("div")
+        .attr("class", "tooltip");
+    </script>
+  </body>
+</html>
