@@ -27,11 +27,11 @@
             return function (t) { return i(t); };
         };
 
-        const arcTween = function (d) {
-            var init_startAngle = 0;
-            var init_endAngle = 0;
-            var interpolate_start = d3.interpolate(init_startAngle, d.startAngle);
-            var interpolate_end = d3.interpolate(init_endAngle, d.endAngle);
+        const arcTween = function(d) {
+            let init_startAngle = 0;
+            let init_endAngle = 0;
+            let interpolate_start = d3.interpolate(init_startAngle, d.startAngle);
+            let interpolate_end = d3.interpolate(init_endAngle, d.endAngle);
             return function (t) {
                 d.startAngle = interpolate_start(t);
                 d.endAngle = interpolate_end(t);
