@@ -130,7 +130,8 @@
         .attr('x', d => xScale(d.data.x0))
         .attr('width', d => xScale(d.data.x1) - xScale(d.data.x0))
         .on("mouseover", (event, d) => {
-          d3.selectAll(`.age${d.data.x0}`).attr("opacity", 0.8)
+          d3.selectAll(`.datarect`).attr("opacity", 0.8)
+          d3.selectAll(`.age${d.data.x0}`).attr("opacity", 1)
 
           d3.select('.d3-tip')
             .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
@@ -139,7 +140,7 @@
           tipShow = true;
         })
         .on("mouseout", (event, d) => {
-          d3.selectAll(`.age${d.data.x0}`).attr("opacity", 1)
+          d3.selectAll(`.datarect`).attr("opacity", 1)
 
           tip.hide(event, d);
           tipShow = false;

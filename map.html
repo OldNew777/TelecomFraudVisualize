@@ -103,7 +103,7 @@
           })
         pointGroup.selectAll("path")
           .transition().duration(300)
-          .attr("opacity", dd => dd.place == d.properties.name ? 0.6 : 0)
+          .attr("opacity", dd => dd.place == d.properties.name ? 1 : 0)
           .transition().duration(500)
           .attr("transform", `translate(${zoomx}, ${zoomy}) scale(${zoomscale})`)
       } else {
@@ -117,7 +117,7 @@
           .transition().duration(500)
           .attr("transform", "")
           .transition().duration(300)
-          .attr("opacity", 0.6)
+          .attr("opacity", 1)
       }
     }
 
@@ -172,9 +172,9 @@
                   "type": "Point",
                   "coordinates": point_xy
                 }))
-                .attr("stroke", "#694ED3")
-                .attr("fill", "#694ED3")
-                .attr("opacity", zoomed && zoom_place != obj.place ? 0 : 0.6)
+                .attr("stroke", "#FE817D")
+                .attr("fill", "#FE817D")
+                .attr("opacity", zoomed && zoom_place != obj.place ? 0 : 1)
                 .attr("transform", zoomed ? `translate(${zoomx}, ${zoomy}) scale(${zoomscale})` : "")
                 .attr("class", `scatter-point ${obj.place}`)
                 .on("mouseover", event => {
@@ -217,7 +217,7 @@
         .attr('stroke-width', 1)
         .attr('id', d => d.properties.name)
         .attr('d', d => geoPath(d))
-        .attr('fill', '#76A6F0')
+        .attr('fill', '#81B8DF')
         .on('mouseover', highlightMap)
         .on('mouseout', removeHighlightMap)
         .on('mousemove', function (event, d) {
