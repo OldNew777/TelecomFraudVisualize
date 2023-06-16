@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>刑期热力图</title>
+    <title>刑期长度分布情况</title>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <style>
       .cell {
@@ -22,19 +22,19 @@
       }
       .legend {
         font-size: 12px;
-        fill: #da0d0d;
+        fill: #000000;
       }
     </style>
   </head>
   <body>
     <script>
-      const xValues = [0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0,15.5,16.0,16.5,17.0,17.5,18.0,18.5,19.0,19.5,20.0,20.5,21.0,21.5,22.0,22.5,23.0,23.5,24.0,24.5,25.0,25.5,26.0,26.5,27.0,27.5,28.0,28.5,29.0,29.5,30.0,30.5];
-      const data = [0,0,2326,5365,1703,2742,2693,3698,1308,1773,909,982,525,584,370,367,206,247,118,96,543,877,199,164,173,131,121,106,45,51,30,11,5,3,0,5,0,1,1,0,77,172,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,8];
+      const xValues = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+      const data = [0,7691,4445,6391,3081,1891,1109,737,453,214,1420,363,304,227,96,41,8,5,1,1,249,0,0,1,0,0,0,0,0,0,10];
       
       // 定义画布大小和边距
       const margin = {top: 20, right: 20, bottom: 50, left: 50};
-      const width = 1500 - margin.left - margin.right;
-      const height = 1000 - margin.top - margin.bottom;
+      const width = 1000 - margin.left - margin.right;
+      const height = 520 - margin.top - margin.bottom;
 
       // 定义颜色比例尺
       const color = d3.scaleSequential(d3.interpolateReds)
@@ -43,7 +43,7 @@
       // 定义x比例尺和轴
       const x = d3.scaleBand()
         .domain(xValues)
-        .range([0, width])
+        .range([0, width * 0.95])
         .padding(0.1);
       const xAxis = d3.axisBottom(x);
 
@@ -69,7 +69,7 @@
           d3.select(".tooltip")
             .style("visibility", "visible")
             .style("white-space", "pre")
-            .text(`刑期 ${i/2} \n人数 ${d}`)
+            .text(`刑期 ${i}年 \n人数 ${d}`)
             .style("top", (d3.event.pageY-10)+"px")
             .style("left",(d3.event.pageX+10)+"px");
         })
@@ -86,22 +86,22 @@
 
       // 添加图例
       const legend = svg.selectAll(".legend")
-        .data(color.ticks(8).slice(1).reverse())
+        .data(color.ticks(8).slice(0).reverse())
         .enter().append("g")
         .attr("class", "legend")
-        .attr("transform", (d, i) => "translate(0," + (i * 20) + ")");
+        .attr("transform", (d, i) => "translate(0," + (i * 28) + ")");
 
       legend.append("rect")
-        .attr("x", width + 10)
+        .attr("x", width * 0.965)
         .attr("width", 18)
-        .attr("height", 18)
+        .attr("height", 26)
         .style("fill", color);
 
       legend.append("text")
-        .attr("x", width + 34)
+        .attr("x", width * 0.99)
         .attr("y", 9)
-        .attr("dy", ".35em")
-        .text(d => d.toFixed(2));
+        .attr("dy", "1em")
+        .text(d => d.toFixed(0));
 
       // 添加tooltip元素
       d3.select("body").append("div")
