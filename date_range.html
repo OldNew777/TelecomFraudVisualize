@@ -15,10 +15,11 @@
         const svg = d3.select('svg');
         const width = svg.attr('width');
         const height = svg.attr('height');
-        const margin = { top: 60, right: 30, bottom: 60, left: 150 };
+        const margin = { top: 60, right: 30, bottom: 120, left: 150 };
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
 
+        const date_range_duration = 1000;
         let range_count = []
 
         const date_range_group = svg.append('g')
@@ -41,7 +42,7 @@
                 .call(yAxis);
             yAxis_group.append('text')
                 .attr('transform', 'rotate(-90)')
-                .attr('y', -50)
+                .attr('y', -100)
                 .attr('x', -innerHeight / 2)
                 .attr('fill', 'black')
                 .text('案件数量')
@@ -55,7 +56,7 @@
                 .attr('transform', `translate(0, ${innerHeight})`)
                 .call(xAxis);
             xAxis_group.append('text')
-                .attr('y', 50)
+                .attr('y', 100)
                 .attr('x', innerWidth / 2)
                 .attr('fill', 'black')
                 .text('上诉-裁定间隔（天）')
@@ -63,6 +64,9 @@
                 .attr('font-size', '3.5em')
                 .attr('font-weight', 'bold');
             xAxis_group.selectAll('.domain').remove();
+
+            date_range_group.selectAll('.tick text')
+                .attr('font-size', '2.5em');
         }
 
         d3.csv('data/date_range.csv').then(data => {
@@ -99,8 +103,11 @@
                 .range([innerHeight, 0])
                 .nice();
 
-            color = d3.scaleLinear().domain([150, d3.max(binData, d => d.length)]).range([0, 1]);
-
+            // color = d3.scaleLinear().domain([150, d3.max(binData, d => d.length)]).range([0, 1]);
+            // color = d3.scaleOrdinal()
+            //     .range(d3.schemePaired.concat(d3.schemeCategory10));
+            color = d3.scaleOrdinal()
+                .range(d3.schemeSet2.concat(d3.schemeSet3));
 
             let his_rec_group = date_range_group.append('g')
                 .attr('id', 'his_rec_group');
@@ -109,14 +116,29 @@
                 .join('rect')
                 .attr('class', 'his_rec')
                 .attr('x', d => xScale(d.x0))
-                .attr('y', d => yScale(d.length))
+                .attr('y', d => yScale(0))
+                .attr('stroke', 'black')
+                .attr('stroke-width', 0.8)
                 .attr('width', d => xScale(d.x1) - xScale(d.x0))
-                .attr('height', d => yScale(0) - yScale(d.length))
-                .attr('fill', d => {
-                    color_0 = '#7d57ba'
-                    color_1 = '#eb6502'
-                    return d3.interpolateRgb(color_0, color_1)(color(d.length));
+                .attr('height', 0)
+                // .attr('fill', d => {
+                //     color_0 = '#7d57ba'
+                //     color_1 = '#eb6502'
+                //     return d3.interpolateRgb(color_0, color_1)(color(d.length));
+                // })
+                .attr('fill', (d, i) => color(i))
+                .on('mouseover', function (d) {
+                    his_rec_group.selectAll('.his_rec').attr('opacity', 0.5);
+                    d3.select(this).attr('fill', 'red');
+                    d3.select(this).attr('opacity', 1.0);
                 })
+                .on('mouseout', function (d) {
+                    his_rec_group.selectAll('.his_rec').attr('opacity', 1.0)
+                        .attr('fill', (d, i) => color(i));
+                })
+                .transition().duration(date_range_duration)
+                .attr('y', d => yScale(d.length))
+                .attr('height', d => yScale(0) - yScale(d.length));
 
             fullAxes();
         });
