@@ -12,12 +12,54 @@
 <body>
     <svg width="1400" height="1400" id="mainsvg" class="svgs"></svg>
     <script>
-        const svg = d3.select('svg');
+        const innerArcGenerator = d3.arc().innerRadius(60).outerRadius(260).padAngle(0.01).padRadius(100).cornerRadius(5);
+        const outerArcGenerator = d3.arc().innerRadius(280).outerRadius(280).padAngle(0.01).padRadius(100).cornerRadius(5);
+        const education_duration = 1000;
+
+        const midAngle = function (d) {
+            return d.startAngle + (d.endAngle - d.startAngle) / 2;
+        };
+
+        // code is from https://d19jftygre6gh0.cloudfront.net/pjsier/28d1d410b64dcd74d9dab348514ed256
+        const tweenDash = function () {
+            let l = this.getTotalLength(),
+                i = d3.interpolateString("0," + l, l + "," + l);
+            return function (t) { return i(t); };
+        };
+
+        const arcTween = function (d) {
+            var init_startAngle = 0;
+            var init_endAngle = 0;
+            var interpolate_start = d3.interpolate(init_startAngle, d.startAngle);
+            var interpolate_end = d3.interpolate(init_endAngle, d.endAngle);
+            return function (t) {
+                d.startAngle = interpolate_start(t);
+                d.endAngle = interpolate_end(t);
+                return innerArcGenerator(d)
+            }
+        };
+
+        const svg = d3.select('#mainsvg');
         const width = svg.attr('width');
         const height = svg.attr('height');
         const margin = { top: 60, right: 30, bottom: 60, left: 150 };
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
+
+        let education_arc_group, education_text_group, education_polyline_group;
+
+        const tip_education = d3.tip().html((event, d) => d.data.description);
+        svg.call(tip_education);
+        tip_education.attr('id', 'tip-education').attr('class', 'd3-tip');
+        const tipele_education = document.getElementById('tip-education');
+
+        d3.select('body').on('mousemove', event => {
+            if (tip_education.isShown) {
+                d3.select('#tip-education')
+                    .style('top', `${event.y + $(window).scrollTop() - tipele_education.offsetHeight - 10}px`)
+                    .style('left', `${event.x + $(window).scrollLeft() - tipele_education.offsetWidth / 2}px`);
+            }
+        });
 
         d3.csv('data/criminals_processed.csv').then(data => {
             // main logic
@@ -44,47 +86,99 @@
             let squeeze_index = -1;
             // sort the education by count: from small to large
             education = education.sort((a, b) => a.count - b.count);
-            console.log(education, n_all);
             education.forEach((d, i) => {
                 if ((d.count + n_other) / n_all < 0.05) {
                     n_other += d.count;
                     other_percentage = (d.count + n_other) / n_all;
                     squeeze_index = i;
                 }
+                else {
+                    d.description = d.education + ': ' + d.count + '人，' +
+                        (d.count / n_all * 100).toFixed(2) + '%';
+                }
             });
             if (squeeze_index != -1) {
+                description = '总计: ' + (other_percentage * 100).toFixed(2) + '%' + '<br/>';
+                for (let i = 0; i < squeeze_index; i++) {
+                    description += education[i].education + ': ' + education[i].count + '人，' +
+                        (education[i].count / n_all * 100).toFixed(2) + '%' + '<br/>';
+                }
+                // delete the last '<br/>'
+                description = description.slice(0, description.length - 1);
                 education = education.slice(squeeze_index + 1, education.length);
-                education.push({ education: '其他', count: n_other });
+                education.push({
+                    education: '其他',
+                    count: n_other,
+                    description: description
+                });
             }
 
             const pie = d3.pie().value(d => d.count);
             const arcData = pie(education);
-            const path = d3.arc().innerRadius(60).outerRadius(260);
-            console.log(education);
 
             const color = d3.scaleOrdinal()
                 .domain(education.map(d => d.education))
                 .range(d3.schemeSet2.concat(d3.schemeSet3));
 
-            svg.append('g')
+            education_arc_group = svg.append('g')
                 .attr('id', 'education_arc_group')
-                .selectAll('.education_arc').data(arcData).join('path')
+            education_arc_group.selectAll('.education_arc').data(arcData).join('path')
                 .attr('class', 'education_arc')
-                .attr('d', path)
                 .attr('transform', `translate(${width / 2}, ${height / 2})`)
                 .attr('fill', d => {
                     return color(d.data.education)
-                });
+                })
+                .on('mouseover', function (event, d) {
+                    education_arc_group.selectAll('.education_arc')
+                        .attr('opacity', 0.5);
+                    d3.select(this).attr('opacity', 1.0);
+                    d3.select('#tip-education')
+                        .style('top', `${event.y + $(window).scrollTop() - tipele_education.offsetHeight - 10}px`)
+                        .style('left', `${event.x + $(window).scrollLeft() - tipele_education.offsetWidth / 2}px`);
+                    tip_education.show(event, d);
+                    tip_education.isShown = true;
+                })
+                .on('mouseout', function (event, d) {
+                    education_arc_group.selectAll('.education_arc')
+                        .attr('opacity', 1.0);
+                    tip_education.hide(event, d);
+                    tip_education.isShown = false;
+                })
+                .transition().duration(education_duration).attrTween('d', arcTween);
 
-            const arcOuter = d3.arc().innerRadius(280).outerRadius(280);
-            svg.append('g')
+            const education_text_pos_func = function (d) {
+                const pos = outerArcGenerator.centroid(d);
+                pos[0] = 360 * (midAngle(d) < Math.PI ? 1 : -1);
+                return pos;
+            }
+
+            education_polyline_group = svg.append('g')
+                .attr('id', 'education_polyline_group')
+                .attr('transform', `translate(${width / 2}, ${height / 2})`);
+            education_polyline_group.selectAll('polyline').data(arcData).join('polyline')
+                .attr('class', 'education_polyline')
+                .attr('points', d => {
+                    return [innerArcGenerator.centroid(d), outerArcGenerator.centroid(d), education_text_pos_func(d)];
+                })
+                .attr('stroke', 'black')
+                .attr('fill', 'none')
+                .attr('stroke-width', 1.5)
+                .transition().duration(education_duration).attrTween('stroke-dasharray', tweenDash);
+
+            education_text_group = svg.append('g')
                 .attr('id', 'education_text_group')
-                .attr('transform', `translate(${width / 2}, ${height / 2})`)
-                .selectAll('.education_text').data(arcData).join('text')
+                .attr('transform', `translate(${width / 2}, ${height / 2})`);
+            education_text_group.selectAll('.education_text').data(arcData).join('text')
                 .attr('class', 'education_text')
-                .attr('transform', d => `translate(${arcOuter.centroid(d)})`)
-                .attr('text-anchor', 'middle')
-                .text(d => d.data.education);
+                .attr('transform', d => {
+                    pos = education_text_pos_func(d);
+                    return `translate(${pos[0]}, ${pos[1]})`
+                })
+                .attr('text-anchor', d => midAngle(d) < Math.PI ? "start" : "end")
+                .attr('font-size', 20)
+                .text(d => d.data.education)
+                .attr('opacity', 0.0)
+                .transition().delay(education_duration).duration(education_duration).attr('opacity', 1.0);
         });
     </script>
 </body>

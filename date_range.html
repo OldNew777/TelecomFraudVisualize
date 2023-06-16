@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <svg width="1400" height="1400" id="mainsvg" class="svgs"></svg>
+    <svg width="1200" height="1000" id="mainsvg" class="svgs"></svg>
     <script>
         const svg = d3.select('svg');
         const width = svg.attr('width');
@@ -58,7 +58,7 @@
                 .attr('y', 50)
                 .attr('x', innerWidth / 2)
                 .attr('fill', 'black')
-                .text('上诉-判罚间隔（天）')
+                .text('上诉-裁定间隔（天）')
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '3.5em')
                 .attr('font-weight', 'bold');
@@ -99,7 +99,7 @@
                 .range([innerHeight, 0])
                 .nice();
 
-            color = d3.scaleOrdinal().range(d3.schemePaired.concat(d3.schemeCategory10));
+            color = d3.scaleLinear().domain([150, d3.max(binData, d => d.length)]).range([0, 1]);
 
 
             let his_rec_group = date_range_group.append('g')
@@ -112,7 +112,11 @@
                 .attr('y', d => yScale(d.length))
                 .attr('width', d => xScale(d.x1) - xScale(d.x0))
                 .attr('height', d => yScale(0) - yScale(d.length))
-                .attr('fill', (d, i) => color(i))
+                .attr('fill', d => {
+                    color_0 = '#7d57ba'
+                    color_1 = '#eb6502'
+                    return d3.interpolateRgb(color_0, color_1)(color(d.length));
+                })
 
             fullAxes();
         });
