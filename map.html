@@ -179,7 +179,7 @@
                 .attr("class", `scatter-point ${obj.place}`)
                 .on("mouseover", event => {
                   highlightMap(event, map_item);
-                  if (zoomed) {
+                  if (zoomed && zoom_place == obj.place) {
                     d3.select('.d3-tip')
                       .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
                       .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
@@ -189,7 +189,7 @@
                 })
                 .on("mouseout", event => {
                   removeHighlightMap(event, map_item);
-                  if (zoomed) {
+                  if (zoomed && zoom_place == obj.place) {
                     tip.hide(event, obj);
                     tipShow = false;
                   }
