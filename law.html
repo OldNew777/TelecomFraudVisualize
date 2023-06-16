@@ -1,153 +1,160 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>法律法条相关案件数</title>
     <!-- 引入 ECharts -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js"></script>
 </head>
+
 <body>
-      
+
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
     <div id="main" style="width:1200px;height:1000px;"></div>
-    
+
     <script type="text/javascript">
-        
+
         // 基于准备好的dom，初始化echarts实例
         var myChart = echarts.init(document.getElementById('main'));
-        
+
         // 指定图表的配置项和数据
         var option = {
             tooltip: {
                 show: false
             },
             series: [
-            {
-                type: 'pie',
-                radius: ['13.5%', '13.8%'],
-                center: ['40%', '50%'],
-                label: {
-                    show: true
+                {
+                    type: 'pie',
+                    radius: [40, 500],
+                    center: ['40%', '50%'],
+                    roseType: 'area',
+                    label: {
+                        show: false
+                    },
+                    itemStyle: {
+                        borderRadius: 8,
+                        opacity: 0.8,
+                    },
+                    data: [
+                        { value: 0, value_raw: 75797, name: '中华人民共和国刑法（1997年）' },
+                        { value: 0, value_raw: 8504, name: '中华人民共和国刑事诉讼法' },
+                        { value: 0, value_raw: 7110, name: '中华人民共和国刑事诉讼法（2018年）' },
+                        { value: 0, value_raw: 5292, name: '最高人民法院、最高人民检察院关于办理诈骗刑事案件具体应用法律若干问题的解释' },
+                        { value: 0, value_raw: 1219, name: '中华人民共和国刑事诉讼法（2012年）' },
+                        { value: 0, value_raw: 1155, name: '最高人民法院、最高人民检察院、公安部关于办理电信网络诈骗等刑事案件适用法律若干问题的意见' },
+                        { value: 0, value_raw: 881, name: '最高人民法院关于审理掩饰、隐瞒犯罪所得、犯罪所得收益刑事案件适用法律若干问题的解释' },
+                        { value: 0, value_raw: 685, name: '最高人民法院、最高人民检察院关于办理侵犯公民个人信息刑事案件适用法律若干问题的解释' },
+                        { value: 0, value_raw: 345, name: '最高人民法院关于处理自首和立功具体应用法律若干问题的解释' },
+                        { value: 0, value_raw: 325, name: '最高人民法院、最高人民检察院关于办理妨害信用卡管理刑事案件具体应用法律若干问题的解释' },
+                        { value: 0, value_raw: 308, name: '最高人民法院关于适用财产刑若干问题的规定' },
+                        { value: 0, value_raw: 64, name: '最高人民法院关于办理减刑、假释案件具体应用法律的规定' },
+                        { value: 0, value_raw: 63, name: '最高人民法院关于审理洗钱等刑事案件具体应用法律若干问题的解释' },
+                        { value: 0, value_raw: 19, name: '中华人民共和国侵权责任法' },
+                        { value: 0, value_raw: 19, name: '最高人民法院关于审理人身损害赔偿案件适用法律若干问题的解释' },
+                        { value: 0, value_raw: 18, name: '最高人民法院关于刑事裁判涉财产部分执行的若干规定' },
+                        { value: 0, value_raw: 17, name: '最高人民法院、最高人民检察院关于办理妨害国（边）境管理刑事案件应用法律若干问题的解释' },
+                        { value: 0, value_raw: 17, name: '中华人民共和国民事诉讼法' },
+                        { value: 0, value_raw: 16, name: '最高人民法院关于处理自首和立功若干具体问题的意见' },
+                        { value: 0, value_raw: 14, name: '最高人民法院、最高人民检察院关于办理贪污贿赂刑事案件适用法律若干问题的解释' },
+                        { value: 0, value_raw: 12, name: '最高人民法院、最高人民检察院关于办理故意杀人、故意伤害刑事案件适用法律若干问题的解释' },
+                        { value: 0, value_raw: 9, name: '最高人民法院关于适用犯罪嫌疑人、被告人认罪认罚从宽制度若干问题的规定' },
+                        { value: 0, value_raw: 7, name: '中华人民共和国合同法' },
+                        { value: 0, value_raw: 6, name: '最高人民法院关于审理网络侵犯著作权刑事案件适用法律若干问题的解释' },
+                        { value: 0, value_raw: 5, name: '最高人民法院关于适用累犯罪的规定' },
+                        { value: 0, value_raw: 4, name: '最高人民法院关于审理妨害诉讼刑事案件适用法律若干问题的解释' },
+                        { value: 0, value_raw: 4, name: '最高人民法院关于限制被告人人身自由强制措施适用法律若干问题的规定' },
+                        { value: 0, value_raw: 4, name: '最高人民法院、最高人民检察院关于办理毒品犯罪案件适用法律若干问题的解释' },
+                        { value: 0, value_raw: 3, name: '最高人民法院关于审理危险驾驶罪案件适用法律若干问题的解释' },
+                        { value: 0, value_raw: 3, name: '中华人民共和国侵犯知识产权法' },
+                        { value: 0, value_raw: 3, name: '中华人民共和国反不正当竞争法' },
+                        { value: 0, value_raw: 2, name: '最高人民法院、最高人民检察院、公安部、司法部关于办理恐怖活动刑事案件具体应用法律若干问题的规定' },
+                        { value: 0, value_raw: 2, name: '中华人民共和国民法总则' },
+                        { value: 0, value_raw: 2, name: '中华人民共和国合伙企业法' },
+                        { value: 0, value_raw: 2, name: '中华人民共和国公司法' },
+                        { value: 0, value_raw: 2, name: '最高人民法院关于适用强制医疗的规定' },
+                        { value: 0, value_raw: 1, name: '中华人民共和国信托法' },
+                        { value: 0, value_raw: 1, name: '最高人民法院关于适用缓刑的规定' },
+                        { value: 0, value_raw: 1, name: '最高人民法院关于适用管制的规定' },
+                        { value: 0, value_raw: 1, name: '最高人民法院关于适用拘役的规定' },
+                        { value: 0, value_raw: 1, name: '最高人民法院、最高人民检察院、公安部、国家安全部关于办理恐怖活动刑事案件具体应用法律若干问题的规定' }
+                    ],
+                    animationDuration: 1200,
+                    animationDelay: function (idx) {
+                        return idx * 10;
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: function (params) { return '《' + params.name + '》<br/>相关条文援引数 ' + params.data.value_raw; },
+                        show: true
+                    }
                 },
-                data: [
-                    {value: 0, name: '1'}
-                ]
-            },
-            {
-                type: 'pie',
-                radius: ['27.7%', '28%'],
-                center: ['40%', '50%'],
-                label: {
-                    show: true
+                {
+                    type: 'pie',
+                    radius: ['13.5%', '13.8%'],
+                    center: ['40%', '50%'],
+                    label: {
+                        show: true
+                    },
+                    data: [
+                        { value: 0, name: '1' }
+                    ]
                 },
-                data: [
-                    {value: 0, name: '10'}
-                ]
-            },
-            {
-                type: 'pie',
-                radius: ['45.4%', '45.7%'],
-                center: ['40%', '50%'],
-                label: {
-                    show: true
+                {
+                    type: 'pie',
+                    radius: ['27.7%', '28%'],
+                    center: ['40%', '50%'],
+                    label: {
+                        show: true
+                    },
+                    data: [
+                        { value: 0, name: '10' }
+                    ]
                 },
-                data: [
-                    {value: 0, name: '100'}
-                ]
-            },
-            {
-                type: 'pie',
-                radius: ['64.4%', '64.7%'],
-                center: ['40%', '50%'],
-                label: {
-                    show: true
+                {
+                    type: 'pie',
+                    radius: ['45.4%', '45.7%'],
+                    center: ['40%', '50%'],
+                    label: {
+                        show: true
+                    },
+                    data: [
+                        { value: 0, name: '100' }
+                    ]
                 },
-                data: [
-                    {value: 0, name: '1000'}
-                ]
-            },
-            {
-                type: 'pie',
-                radius: ['84.4%', '84.7%'],
-                center: ['40%', '50%'],
-                label: {
-                    show: true
+                {
+                    type: 'pie',
+                    radius: ['64.4%', '64.7%'],
+                    center: ['40%', '50%'],
+                    label: {
+                        show: true
+                    },
+                    data: [
+                        { value: 0, name: '1000' }
+                    ]
                 },
-                data: [
-                    {value: 0, name: '10000'}
-                ]
-            },
-            {
-                type: 'pie',
-                radius: [40, 500],
-                center: ['40%', '50%'],
-                roseType: 'area',
-                label: {
-                    show: false
+                {
+                    type: 'pie',
+                    radius: ['84.4%', '84.7%'],
+                    center: ['40%', '50%'],
+                    label: {
+                        show: true
+                    },
+                    data: [
+                        { value: 0, name: '10000' }
+                    ]
                 },
-                itemStyle: {
-                    borderRadius: 8,
-                    opacity: 0.8,
-                },
-                data: [
-                    {value: 16.209872161611408, name: '中华人民共和国刑法（1997年）'},
-                    {value: 13.054095520550748, name: '中华人民共和国刑事诉讼法'},
-                    {value: 12.795836740933648, name: '中华人民共和国刑事诉讼法（2018年）'},
-                    {value: 12.369869938634876, name: '最高人民法院、最高人民检察院关于办理诈骗刑事案件具体应用法律若干问题的解释'},
-                    {value: 10.252665432450248, name: '中华人民共和国刑事诉讼法（2012年）'},
-                    {value: 10.174925682500678, name: '最高人民法院、最高人民检察院、公安部关于办理电信网络诈骗等刑事案件适用法律若干问题的意见'},
-                    {value: 9.784634845557521, name: '最高人民法院关于审理掩饰、隐瞒犯罪所得、犯罪所得收益刑事案件适用法律若干问题的解释'},
-                    {value: 9.422064766172813, name: '最高人民法院、最高人民检察院关于办理侵犯公民个人信息刑事案件适用法律若干问题的解释'},
-                    {value: 8.434628227636725, name: '最高人民法院关于处理自首和立功具体应用法律若干问题的解释'},
-                    {value: 8.348728154231077, name: '最高人民法院、最高人民检察院关于办理妨害信用卡管理刑事案件具体应用法律若干问题的解释'},
-                    {value: 8.271463027904375, name: '最高人民法院关于适用财产刑若干问题的规定'},
-                    {value: 6.022367813028454, name: '最高人民法院关于办理减刑、假释案件具体应用法律的规定'},
-                    {value: 6.0, name: '最高人民法院关于审理洗钱等刑事案件具体应用法律若干问题的解释'},
-                    {value: 4.321928094887363, name: '中华人民共和国侵权责任法'},
-                    {value: 4.321928094887363, name: '最高人民法院关于审理人身损害赔偿案件适用法律若干问题的解释'},
-                    {value: 4.247927513443585, name: '最高人民法院关于刑事裁判涉财产部分执行的若干规定'},
-                    {value: 4.169925001442312, name: '最高人民法院、最高人民检察院关于办理妨害国（边）境管理刑事案件应用法律若干问题的解释'},
-                    {value: 4.169925001442312, name: '中华人民共和国民事诉讼法'},
-                    {value: 3.9068905956085187, name: '最高人民法院关于处理自首和立功若干具体问题的意见'},
-                    {value: 3.700439718141092, name: '最高人民法院、最高人民检察院关于办理贪污贿赂刑事案件适用法律若干问题的解释'},
-                    {value: 3.321928094887362, name: '最高人民法院、最高人民检察院关于办理故意杀人、故意伤害刑事案件适用法律若干问题的解释'},
-                    {value: 3.321928094887362, name: '最高人民法院关于适用犯罪嫌疑人、被告人认罪认罚从宽制度若干问题的规定'},
-                    {value: 2.8073549220576047, name: '中华人民共和国合同法'},
-                    {value: 2.584962500721157, name: '最高人民法院关于审理网络侵犯著作权刑事案件适用法律若干问题的解释'},
-                    {value: 2.321928094887362, name: '最高人民法院关于适用累犯罪的规定'},
-                    {value: 2.321928094887362, name: '最高人民法院关于审理妨害诉讼刑事案件适用法律若干问题的解释'},
-                    {value: 2.0, name: '最高人民法院关于限制被告人人身自由强制措施适用法律若干问题的规定'},
-                    {value: 2.0, name: '最高人民法院、最高人民检察院关于办理毒品犯罪案件适用法律若干问题的解释'},
-                    {value: 1.5849625007211563, name: '最高人民法院关于审理危险驾驶罪案件适用法律若干问题的解释'},
-                    {value: 1.5849625007211563, name: '中华人民共和国侵犯知识产权法'},
-                    {value: 1.0, name: '中华人民共和国反不正当竞争法'},
-                    {value: 1.0, name: '最高人民法院、最高人民检察院、公安部、司法部关于办理恐怖活动刑事案件具体应用法律若干问题的规定'},
-                    {value: 1.0, name: '中华人民共和国民法总则'},
-                    {value: 1.0, name: '中华人民共和国合伙企业法'},
-                    {value: 1.0, name: '中华人民共和国公司法'},
-                    {value: 1.0, name: '最高人民法院关于适用强制医疗的规定'},
-                    {value: 1.0, name: '中华人民共和国信托法'},
-                    {value: 1.0, name: '最高人民法院关于适用缓刑的规定'},
-                    {value: 1.0, name: '最高人民法院关于适用管制的规定'},
-                    {value: 1.0, name: '最高人民法院关于适用拘役的规定'},
-                    {value: 1.0, name: '最高人民法院、最高人民检察院、公安部、国家安全部关于办理恐怖活动刑事案件具体应用法律若干问题的规定'}
-                ],
-                animationDuration: 1200,
-                animationDelay: function (idx) {
-                    return idx * 10;
-                },
-                tooltip:{
-                    trigger: 'item',
-                    formatter: function(params) 
-                        {return '《' + params.name + '》<br/>相关案件数 ' + Math.round(Math.pow(2, params.value) - 1);},
-                    show:true
-                }
-            }]
+            ]
         };
+
+        option.series[0].data.forEach(item => {
+            item.value = Math.log(item.value_raw + 1)
+        })
 
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
     </script>
-    
+
 </body>
+
 </html>
