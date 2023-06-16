@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>法律依据南丁格尔玫瑰图</title>
+    <!-- 引入 ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js"></script>
+</head>
+<body>
+    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <div id="main" style="width:1200px;height:1000px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} {b}<br/>案件数 {c}'
+            },
+            legend: {
+                data:['销量']
+            },
+            series: [{
+                name: '法律依据数',
+                type: 'pie',
+                radius: [40, 800],
+                center: ['40%', '80%'],
+                roseType: 'area',
+                label: {
+                    show: false
+                },
+                itemStyle: {
+                    borderRadius: 8
+                },
+                data: [
+                {value:21, name:'1'},
+                {value:1385, name:'2'},
+                {value:205, name:'3'},
+                {value:190, name:'4'},
+                {value:288, name:'5'},
+                {value:358, name:'6'},
+                {value:679, name:'7'},
+                {value:571, name:'8'},
+                {value:575, name:'9'},
+                {value:598, name:'10'},
+                {value:471, name:'11'},
+                {value:411, name:'12'},
+                {value:421, name:'13'},
+                {value:370, name:'14'},
+                {value:337, name:'15'},
+                {value:296, name:'16'},
+                {value:250, name:'17'},
+                {value:193, name:'18'},
+                {value:208, name:'19'},
+                {value:162, name:'20'},
+                {value:242, name:'21'},
+                {value:174, name:'22'},
+                {value:127, name:'23'},
+                {value:128, name:'24'},
+                {value:81, name:'25'},
+                {value:66, name:'26'},
+                {value:57, name:'27'},
+                {value:49, name:'28'},
+                {value:41, name:'29'},
+                {value:28, name:'30'},
+                {value:18, name:'31'},
+                {value:29, name:'32'},
+                {value:17, name:'33'},
+                {value:9, name:'34'},
+                {value:11, name:'35'},
+                {value:5, name:'36'},
+                {value:10, name:'37'},
+                {value:7, name:'38'},
+                {value:5, name:'39'},
+                {value:3, name:'40'},
+                {value:2, name:'41'},
+                {value:2, name:'42'},
+                {value:6, name:'43'},
+                {value:4, name:'44'},
+                {value:2, name:'45'},
+                {value:3, name:'46'},
+                {value:3, name:'47'},
+                {value:1, name:'48'},
+                {value:0, name:'49'},
+                {value:0, name:'50'},
+                {value:4, name:'51'},
+                {value:0, name:'52'},
+                {value:0, name:'53'},
+                {value:0, name:'54'},
+                {value:1, name:'55'},
+                {value:0, name:'56'},
+                {value:1, name:'57'},
+                {value:0, name:'58'},
+                {value:1, name:'59'},
+                {value:0, name:'60'},
+                {value:0, name:'61'},
+                {value:0, name:'62'},
+                {value:1, name:'63'},
+                {value:1, name:'64'}
+                ]
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
+</body>
+</html>
