@@ -19,6 +19,14 @@
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
 
+        const tip = d3.tip().attr("class", "d3-tip")
+            .html((event, d) => {
+                return `上诉-裁定间隔：${d.x0}-${d.x1} 天<br>案件数量：${d.length} 件`
+            })
+        svg.call(tip)
+        const tipele = document.getElementsByClassName('d3-tip')[0];
+        let tipShow = false;
+
         const date_range_duration = 1000;
         let range_count = []
 
@@ -127,14 +135,26 @@
                 //     return d3.interpolateRgb(color_0, color_1)(color(d.length));
                 // })
                 .attr('fill', (d, i) => color(i))
-                .on('mouseover', function (d) {
+                .on('mouseover', function (event, d) {
                     his_rec_group.selectAll('.his_rec').attr('opacity', 0.5);
                     d3.select(this).attr('fill', 'red');
                     d3.select(this).attr('opacity', 1.0);
+                    d3.select('.d3-tip')
+                        .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
+                        .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
+                    tip.show(event, d);
+                    tipShow = true;
                 })
-                .on('mouseout', function (d) {
+                .on('mouseout', function (event, d) {
                     his_rec_group.selectAll('.his_rec').attr('opacity', 1.0)
                         .attr('fill', (d, i) => color(i));
+                    tip.hide(event, d);
+                    tipShow = false;
+                })
+                .on("mousemove", (event, d) => {
+                    d3.select('.d3-tip')
+                        .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
+                        .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
                 })
                 .transition().duration(date_range_duration)
                 .attr('y', d => yScale(d.length))
