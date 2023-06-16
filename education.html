@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <svg width="1400" height="1400" id="mainsvg" class="svgs"></svg>
+    <svg width="1000" height="1000" id="mainsvg" class="svgs" transform="scale(0.6), translate(-400, -400)"></svg>
     <script>
         const innerArcGenerator = d3.arc().innerRadius(60).outerRadius(260).padAngle(0.01).padRadius(100).cornerRadius(5);
         const outerArcGenerator = d3.arc().innerRadius(280).outerRadius(280).padAngle(0.01).padRadius(100).cornerRadius(5);
@@ -132,10 +132,10 @@
                     education_arc_group.selectAll('.education_arc')
                         .attr('opacity', 0.5);
                     d3.select(this).attr('opacity', 1.0);
+                    tip_education.show(event, d);
                     d3.select('#tip-education')
                         .style('top', `${event.y + $(window).scrollTop() - tipele_education.offsetHeight - 10}px`)
                         .style('left', `${event.x + $(window).scrollLeft() - tipele_education.offsetWidth / 2}px`);
-                    tip_education.show(event, d);
                     tip_education.isShown = true;
                 })
                 .on('mouseout', function (event, d) {
@@ -148,7 +148,7 @@
 
             const education_text_pos_func = function (d) {
                 const pos = outerArcGenerator.centroid(d);
-                pos[0] = 360 * (midAngle(d) < Math.PI ? 1 : -1);
+                pos[0] = 310 * (midAngle(d) < Math.PI ? 1 : -1);
                 return pos;
             }
 
@@ -175,7 +175,7 @@
                     return `translate(${pos[0]}, ${pos[1]})`
                 })
                 .attr('text-anchor', d => midAngle(d) < Math.PI ? "start" : "end")
-                .attr('font-size', 20)
+                .attr('font-size', 25)
                 .text(d => d.data.education)
                 .attr('opacity', 0.0)
                 .transition().delay(education_duration).duration(education_duration).attr('opacity', 1.0);
