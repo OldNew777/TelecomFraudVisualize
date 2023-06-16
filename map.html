@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Assignment2</title>
+  <script src="d3.min.js"></script>
+  <script src="d3-v6-tip.js"></script>
+  <script src="d3-simple-slider.min.js"></script>
+  <script src="jquery-3.4.1.min.js"></script>
+  <link rel="stylesheet" href="d3-tip.css">
+</head>
+
+<body>
+  <svg width="1600" height="1000" id="mainsvg" class="svgs"></svg>
+  <script>
+    // The following code is the typical routine of my d3.js code. 
+    const svg = d3.select('svg');
+    const width = svg.attr('width');
+    const height = svg.attr('height');
+    const margin = { top: 60, right: 30, bottom: 60, left: 150 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    // const mainGroup = svg.append('g')
+    //   .attr('transform', `translate(${margin.left}, ${margin.top})`)
+    const mapGroup = svg.append('g')
+    const pointGroup = svg.append('g')
+    const xValue = d => d.value;
+    const yValue = d => d.name;
+    const xScale = d3.scaleLinear();
+    const yScale = d3.scaleBand();
+
+
+    var mercator = d3.geoMercator()
+      .center([107, 34])//设置投影的中心点 经纬度
+      .scale(1000)//设置缩放因子
+      .translate([width / 2, height / 2]);//设置平移偏移量
+
+    var geoPath = d3.geoPath().projection(mercator).pointRadius(1);
+
+
+    const tip = d3.tip().attr("class", "d3-tip")
+      .html((event, d) => {
+        if (!zoomed) {
+          return `${d.properties.name}`;
+        } else {
+          // show detail
+          return `${d.date}<br>涉案人数：${d.criminals.length} 人`
+        }
+      })
+    svg.call(tip)
+    const tipele = document.getElementsByClassName('d3-tip')[0];
+    let tipShow = false;
+
+    // function update() {
+    //   if (tipShow) {
+    //     d3.select('.d3-tip')
+    //       .style('top', `${tipPos.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
+    //       .style('left', `${tipPos.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
+    //   }
+    // }
+    // setInterval(update, 100);
+
+    let zoomed = false;
+    let zoomx, zoomy, zoomscale, zoom_place;
+    function highlightMap(event, d) {
+      if (!zoomed) {
+        d3.select(`#${d.properties.name}`).attr('opacity', 0.5);
+        d3.select('.d3-tip')
+          .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
+          .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
+        tip.show(event, d);
+        tipShow = true;
+      }
+    }
+
+    function removeHighlightMap(event, d) {
+      if (!zoomed) {
+        d3.select(`#${d.properties.name}`).attr('opacity', 1);
+        tip.hide(event, d);
+        tipShow = false;
+      }
+    }
+
+    function clickMap(event, d) {
+      let bbox = document.getElementById(`${d.properties.name}`).getBBox();
+      let centerx = bbox.x + bbox.width / 2;
+      let centery = bbox.y + bbox.height / 2;
+      zoomscale = Math.min(width / bbox.width, height / bbox.height) / 1.2;
+      zoomx = -centerx * zoomscale + width / 2;
+      zoomy = -centery * zoomscale + height / 2;
+      if (!zoomed) {
+        zoomed = true;
+        zoom_place = d.properties.name;
+        mapGroup.selectAll("path")
+          .transition().duration(300)
+          .attr("opacity", dd => dd == d ? 1 : 0)
+          .transition().duration(500)
+          .attr("transform", `translate(${zoomx}, ${zoomy}) scale(${zoomscale})`)
+          .on("end", () => {
+
+            tip.hide();
+            tipShow = false;
+          })
+        pointGroup.selectAll("path")
+          .transition().duration(300)
+          .attr("opacity", dd => dd.place == d.properties.name ? 0.6 : 0)
+          .transition().duration(500)
+          .attr("transform", `translate(${zoomx}, ${zoomy}) scale(${zoomscale})`)
+      } else {
+        mapGroup.selectAll("path")
+          .transition().duration(500)
+          .attr("transform", "")
+          .transition().duration(300)
+          .attr("opacity", 1)
+          .on("end", () => { zoomed = false; })
+        pointGroup.selectAll("path")
+          .transition().duration(500)
+          .attr("transform", "")
+          .transition().duration(300)
+          .attr("opacity", 0.6)
+      }
+    }
+
+    let bounding_boxes = {};
+    function calc_bounding_box(map_data) {
+      map_data.features.forEach(map_item => {
+        let map_coord = map_item.geometry.coordinates;
+        let max_point = [-1, -1];
+        let min_point = [1e10, 1e10];
+        map_coord.forEach(item => item[0].forEach(point => {
+          max_point[0] = Math.max(max_point[0], point[0]);
+          min_point[0] = Math.min(min_point[0], point[0]);
+          max_point[1] = Math.max(max_point[1], point[1]);
+          min_point[1] = Math.min(min_point[1], point[1]);
+        }))
+        bounding_boxes[map_item.properties.name] = {
+          "min": min_point,
+          "max": max_point
+        };
+      })
+      console.log(bounding_boxes);
+    }
+
+    function scatter(year, map_data) {
+      d3.json("data/place.json").then(data => {
+        pointGroup.selectAll(".scatter-point").remove();
+        Object.keys(data).forEach(key => {
+          // if (key != "065796bdaa33460d94d2aa030108ac29") return;
+          let obj = data[key];
+          let date = new Date(obj.date);
+          if (date.getFullYear() != year) return;
+          map_data.features.forEach(map_item => {
+            if (map_item.properties.name == obj.place) {
+              let point_xy = [-1, -1];
+              let bounding_box = bounding_boxes[map_item.properties.name];
+              let hit_flag = false;
+              while (!hit_flag) {
+                point_xy[0] = Math.random() * (bounding_box.max[0] - bounding_box.min[0]) + bounding_box.min[0];
+                point_xy[1] = Math.random() * (bounding_box.max[1] - bounding_box.min[1]) + bounding_box.min[1];
+                // console.log(point_xy);
+
+                if (d3.polygonContains(map_item.geometry.coordinates[0][0], point_xy)) { hit_flag = true; }
+              }
+              // console.log(d3.select(`#${map_item.properties.name}`))
+              // if(map_item.properties.name == "甘肃省") {
+              //   console.log(map_item.geometry.coordinates[0][0])
+              // console.log(d3.polygonContains(map_item.geometry.coordinates[0][0], [107, 35.5]))
+              // }
+              pointGroup.append("path")
+                .data([obj])
+                .attr("d", geoPath({
+                  "type": "Point",
+                  "coordinates": point_xy
+                }))
+                .attr("stroke", "#694ED3")
+                .attr("fill", "#694ED3")
+                .attr("opacity", zoomed && zoom_place != obj.place ? 0 : 0.6)
+                .attr("transform", zoomed ? `translate(${zoomx}, ${zoomy}) scale(${zoomscale})` : "")
+                .attr("class", `scatter-point ${obj.place}`)
+                .on("mouseover", event => {
+                  highlightMap(event, map_item);
+                  if (zoomed) {
+                    d3.select('.d3-tip')
+                      .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
+                      .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
+                    tip.show(event, obj);
+                    tipShow = true;
+                  }
+                })
+                .on("mouseout", event => {
+                  removeHighlightMap(event, map_item);
+                  if (zoomed) {
+                    tip.hide(event, obj);
+                    tipShow = false;
+                  }
+                })
+                .on("click", event => { clickMap(event, map_item) })
+            }
+          });
+        })
+      });
+    }
+
+    d3.json("data/map.json").then(data => {
+      calc_bounding_box(data);
+      console.log(data)
+      var scaleColor = d3.scaleOrdinal()
+        .domain(d3.range(data.features.length))
+        .range(d3.schemeCategory10);
+
+
+      //绘制区域
+      mapGroup.selectAll('path')
+        .data(data.features)
+        .join("path")
+        .attr('stroke', 'gray')
+        .attr('stroke-width', 1)
+        .attr('id', d => d.properties.name)
+        .attr('d', d => geoPath(d))
+        .attr('fill', '#76A6F0')
+        .on('mouseover', highlightMap)
+        .on('mouseout', removeHighlightMap)
+        .on('mousemove', function (event, d) {
+          if (tipShow) {
+            d3.select('.d3-tip')
+              .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
+              .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
+          }
+        })
+        .on('click', clickMap)
+
+      var slider = d3
+        .sliderHorizontal()
+        .tickFormat(d3.format("d"))
+        .min(2013)
+        .max(2021)
+        .step(1)
+        .width(300)
+        .displayValue(false)
+        .on('onchange', (val) => {
+          console.log(val);
+          scatter(val, data)
+        });
+      scatter(2013, data);
+
+      svg
+        .append('svg')
+        .attr('width', 500)
+        .attr('height', 100)
+        .append('g')
+        .attr('transform', 'translate(30,30)')
+        .call(slider);
+
+      // svg.append('g')
+      // .selectAll('text')
+      // .data(data.features)
+      // .enter()
+      // .append('text')
+      // .attr('font-size',12)
+      // .attr('text-anchor', 'middle')
+      // .attr('x',function (d,i) {
+      //     var position = mercator(d.properties.centroid || [0,0]);
+      //     return position[0];
+      // })
+      // .attr('y',function (d,i) {
+      //     var position = mercator(d.properties.centroid || [0,0]);
+      //     return position[1];
+      // })
+      // .attr('dy',function (d,i) {
+      //     //这里为什么这么写呢，因为澳门和香港重合了，挤到一起了。
+      //     if (d.properties.name === '澳门特别行政区') {
+      //         return 10;
+      //     }
+      // })
+      // .text(function (d,i) {
+      //    return d.properties.name + "1";
+      // });
+
+
+    });
+
+  </script>
+</body>
+
+</html>
