@@ -44,7 +44,7 @@
           return `${d.properties.name}`;
         } else {
           // show detail
-          return `${d.date}<br>涉案人数：${d.criminals.length} 人`
+          return `${d.title}<br>${d.date}<br>涉案人数：${d.criminals.length} 人<br>关键词：${d.keywords.join(", ")}`
         }
       })
     svg.call(tip)
@@ -58,17 +58,17 @@
     //       .style('left', `${tipPos.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
     //   }
     // }
-    // setInterval(update, 100);
+    // setInterval(update, 10);
 
     let zoomed = false;
     let zoomx, zoomy, zoomscale, zoom_place;
     function highlightMap(event, d) {
       if (!zoomed) {
         d3.select(`#${d.properties.name}`).attr('opacity', 0.5);
+        tip.show(event, d);
         d3.select('.d3-tip')
           .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
           .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
-        tip.show(event, d);
         tipShow = true;
       }
     }
@@ -142,7 +142,7 @@
     }
 
     function scatter(year, map_data) {
-      d3.json("data/place.json").then(data => {
+      d3.json("data/place2.json").then(data => {
         pointGroup.selectAll(".scatter-point").remove();
         Object.keys(data).forEach(key => {
           // if (key != "065796bdaa33460d94d2aa030108ac29") return;
@@ -180,10 +180,10 @@
                 .on("mouseover", event => {
                   highlightMap(event, map_item);
                   if (zoomed && zoom_place == obj.place) {
+                    tip.show(event, obj);
                     d3.select('.d3-tip')
                       .style('top', `${event.y + $(window).scrollTop() - tipele.offsetHeight - 10}px`)
                       .style('left', `${event.x + $(window).scrollLeft() - tipele.offsetWidth / 2}px`);
-                    tip.show(event, obj);
                     tipShow = true;
                   }
                 })
