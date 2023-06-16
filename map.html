@@ -11,10 +11,10 @@
 </head>
 
 <body>
-  <svg width="1600" height="1000" id="mainsvg" class="svgs"></svg>
+  <svg width="1600" height="1000" id="mapsvg" class="svgs"></svg>
   <script>
     // The following code is the typical routine of my d3.js code. 
-    const svg = d3.select('svg');
+    const svg = d3.select('#mapsvg');
     const width = svg.attr('width');
     const height = svg.attr('height');
     const margin = { top: 60, right: 30, bottom: 60, left: 150 };
