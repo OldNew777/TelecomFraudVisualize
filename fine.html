@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>罚金热力图</title>
+    <title>罚金数额分布情况</title>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <style>
       .cell {
@@ -22,7 +22,7 @@
       }
       .legend {
         font-size: 12px;
-        fill: #da0d0d;
+        fill: #000000;
       }
     </style>
   </head>
@@ -34,7 +34,7 @@
       // 定义画布大小和边距
       const margin = {top: 20, right: 20, bottom: 50, left: 50};
       const width = 800 - margin.left - margin.right;
-      const height = 600 - margin.top - margin.bottom;
+      const height = 400 - margin.top - margin.bottom;
 
       // 定义颜色比例尺
       const color = d3.scaleSequential(d3.interpolateBlues)
@@ -43,7 +43,7 @@
       // 定义x比例尺和轴
       const x = d3.scaleBand()
         .domain(xValues)
-        .range([0, width])
+        .range([0, width * 0.9])
         .padding(1);
       const xAxis = d3.axisBottom(x);
 
@@ -61,7 +61,7 @@
         .attr("class", "cell")
         .attr("x", (d, i) => x(xValues[i]))
         .attr("y", 0)
-        .attr("width", width / data.length-6)
+        .attr("width", width / data.length * 0.84)
         .attr("height", height)
         .attr("fill", d => color(d))
         .on("mouseover", function(d, i) { // 鼠标移上去显示tooltip
@@ -89,19 +89,19 @@
         .data(color.ticks(8).slice(1).reverse())
         .enter().append("g")
         .attr("class", "legend")
-        .attr("transform", (d, i) => "translate(0," + (i * 20) + ")");
+        .attr("transform", (d, i) => "translate(0," + (i * 26) + ")");
 
       legend.append("rect")
-        .attr("x", width + 10)
+        .attr("x", width * 0.92)
         .attr("width", 18)
-        .attr("height", 18)
+        .attr("height", 24)
         .style("fill", color);
 
       legend.append("text")
-        .attr("x", width + 34)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .text(d => d.toFixed(2));
+        .attr("x", width * 0.95)
+        .attr("y", 15)
+        .attr("dy", ".1em")
+        .text(d => d.toFixed(0));
 
       // 添加tooltip元素
       d3.select("body").append("div")
